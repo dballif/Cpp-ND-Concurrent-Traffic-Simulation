@@ -15,13 +15,20 @@ class Vehicle;
 // Also, the class should define an std::dequeue called _queue, which stores objects of type TrafficLightPhase. 
 // Also, there should be an std::condition_variable as well as an std::mutex as private members. 
 
+//Largely taken from the Udacity Message Queue tasks in previous lessons
+
 template <class T>
 class MessageQueue
 {
 public:
-
-private:
+	T receive();
     
+    void send(T &&msg);
+    
+private:
+     	std::mutex _mutex;
+    	std::condition_variable _cond;
+    	std::deque<T> _dequeue;
 };
 
 // FP.1 : Define a class „TrafficLight“ which is a child class of TrafficObject. 
@@ -30,13 +37,17 @@ private:
 // can be either „red“ or „green“. Also, add the private method „void cycleThroughPhases()“. 
 // Furthermore, there shall be the private member _currentPhase which can take „red“ or „green“ as its value. 
 
+enum TrafficLightPhase{
+  red,
+  green};
+
 class TrafficLight : public TrafficObject
 {
 public:
     // constructor / desctructor
-
+	TrafficLight();
     // getters / setters
-	TrafficLightPhase getCurrentPhase(){}
+	TrafficLightPhase getCurrentPhase();
     // typical behaviour methods
 	void waitForGreen(){}
     void simulate(){}
@@ -49,6 +60,8 @@ private:
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling 
     // send in conjunction with move semantics.
 
+	MessageQueue<TrafficLightPhase> _messageQueue;
+    
     std::condition_variable _condition;
     std::mutex _mutex;
 };
